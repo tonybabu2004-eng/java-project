@@ -12,10 +12,18 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17' 
+
+      - name: Build with Maven
+        run: mvn clean package
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -23,7 +31,6 @@ jobs:
           role-to-assume: arn:aws:iam::204615365209:role/tony-role
           aws-region: us-east-1
 
-      
       - name: Sync files to S3
         run: |
-          aws s3 sync . s3://tony-bucket-29 --delete
+          aws s3 sync target/ s3://tony-bucket-29 --delete
